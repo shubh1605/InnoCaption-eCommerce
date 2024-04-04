@@ -160,7 +160,6 @@ const AllProducts = (props) => {
                   addToCartFunction={addToCart}
                   product={item}
                   isInCart={isInCart}
-                  // inCart={item.id in cartProducts}
                 />
               );
             })
@@ -175,9 +174,6 @@ const AllProducts = (props) => {
           )
         ) : (
           <ClipLoader
-            // color={color}
-            // loading={loading}
-            // cssOverride={override}
             className="spinner"
             size={75}
             aria-label="Loading Spinner"
