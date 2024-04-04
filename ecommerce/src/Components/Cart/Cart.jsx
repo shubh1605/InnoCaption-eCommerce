@@ -72,8 +72,11 @@ const Cart = (props) => {
   // console.log(cartItems)
 
   return (
-    <div>
-      <section className="h-100 h-custom" style={{ backgroundColor: "#eee" }}>
+    <div
+      className="cart-main-container"
+      style={{ backgroundColor: "rgb(238, 238, 238)", paddingTop: "70px" }}
+    >
+      <section className="h-100 h-custom">
         <MDBContainer className="py-5 h-100">
           <MDBRow className="justify-content-center align-items-center h-100">
             <MDBCol>

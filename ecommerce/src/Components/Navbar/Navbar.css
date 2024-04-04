@@ -1,5 +1,5 @@
 .number{
-    font-size: .6rem;
+  font-size: .6rem;
   position: relative;
   top: -12px;
   right: 5px;
@@ -9,4 +9,8 @@
   background-color: #418deb;
   border-radius: 50%;
   padding: 5px;
+}
+.navbar{
+  /* margin-bottom: 30px; */
+  
 }

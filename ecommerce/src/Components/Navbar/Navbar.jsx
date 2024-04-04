@@ -8,7 +8,7 @@ import "../Navbar/Navbar.css";
 const CustomNavbar = (props) => {
   return (
     <>
-      <Navbar className="bg-body-tertiary">
+      <Navbar className="bg-body-tertiary fixed-top">
         <Container>
           <Navbar.Brand href="/">Ecommerce</Navbar.Brand>
           <Navbar.Toggle />

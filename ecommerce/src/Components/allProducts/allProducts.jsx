@@ -106,80 +106,82 @@ const AllProducts = (props) => {
   }, []);
 
   return (
-    <div className="allProducts">
-      <div className="wrapper">
-        <div className="search-wrapper"></div>
-      </div>
-      <h1> ALL PRODUCTS </h1>
+    <div style={{ backgroundColor: "rgb(238, 238, 238)", paddingTop: "70px" }}>
+      <div className="allProducts">
+        <div className="wrapper">
+          <div className="search-wrapper"></div>
+        </div>
+        <p className="all-products-text"> ALL PRODUCTS </p>
 
-      <hr className="allproducts-hr" />
-      <div className=" mt-5 search-container display flex">
-        <InputGroup className="mb-3 ">
-          <Form.Control
-            placeholder="Search products by name"
-            name="search-form"
-            id="search-form"
-            value={searchNameVal}
-            onChange={(e) => updateNameSearch(e.target.value)}
-            aria-label="Recipient's username"
-            aria-describedby="basic-addon2"
-          />
-        </InputGroup>
-        <Form.Select onChange={(e) => updateCategorySearch(e.target.value)}>
-          <option value="">All categories</option>
+        <hr className="allproducts-hr" />
+        <div className=" mt-5 search-container display flex">
+          <InputGroup className="mb-3 ">
+            <Form.Control
+              placeholder="Search products by name"
+              name="search-form"
+              id="search-form"
+              value={searchNameVal}
+              onChange={(e) => updateNameSearch(e.target.value)}
+              aria-label="Recipient's username"
+              aria-describedby="basic-addon2"
+            />
+          </InputGroup>
+          <Form.Select onChange={(e) => updateCategorySearch(e.target.value)}>
+            <option value="">All categories</option>
 
-          {categories ? (
-            categories.map((item) => (
-              <option key={item.toLowerCase()} value={item.toLowerCase()}>
-                {item.toUpperCase()}
-              </option>
-            ))
+            {categories ? (
+              categories.map((item) => (
+                <option key={item.toLowerCase()} value={item.toLowerCase()}>
+                  {item.toUpperCase()}
+                </option>
+              ))
+            ) : (
+              <></>
+            )}
+          </Form.Select>
+        </div>
+        <div className="container mt-4 text-center">
+          <Alert
+            variant={alertVariant}
+            show={alertShow}
+            onClose={() => alertSetShow(false)}
+            dismissible
+          >
+            <Alert.Heading>{alertText}</Alert.Heading>
+          </Alert>
+        </div>
+
+        <div className="product-list">
+          {data ? (
+            Object.keys(filteredData).length != 0 ? (
+              filteredData.map((item, i) => {
+                return (
+                  <Product
+                    key={i}
+                    addToCartFunction={addToCart}
+                    product={item}
+                    isInCart={isInCart}
+                  />
+                );
+              })
+            ) : (
+              <div>
+                <Alert variant="info">
+                  <Alert.Heading>
+                    No items match the search you made!
+                  </Alert.Heading>
+                </Alert>
+              </div>
+            )
           ) : (
-            <></>
+            <ClipLoader
+              className="spinner"
+              size={75}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
           )}
-        </Form.Select>
-      </div>
-      <div className="container mt-4 text-center">
-        <Alert
-          variant={alertVariant}
-          show={alertShow}
-          onClose={() => alertSetShow(false)}
-          dismissible
-        >
-          <Alert.Heading>{alertText}</Alert.Heading>
-        </Alert>
-      </div>
-
-      <div className="product-list">
-        {data ? (
-          Object.keys(filteredData).length != 0 ? (
-            filteredData.map((item, i) => {
-              return (
-                <Product
-                  key={i}
-                  addToCartFunction={addToCart}
-                  product={item}
-                  isInCart={isInCart}
-                />
-              );
-            })
-          ) : (
-            <div>
-              <Alert variant="info">
-                <Alert.Heading>
-                  No items match the search you made!
-                </Alert.Heading>
-              </Alert>
-            </div>
-          )
-        ) : (
-          <ClipLoader
-            className="spinner"
-            size={75}
-            aria-label="Loading Spinner"
-            data-testid="loader"
-          />
-        )}
+        </div>
       </div>
     </div>
   );

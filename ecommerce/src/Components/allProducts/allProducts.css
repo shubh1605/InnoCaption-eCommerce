@@ -1,11 +1,10 @@
 .allProducts{
-
     margin-top: 10px;
     align-items: center;
     gap: 10px;
 }
 
-.allProducts h1{
+.all-products-text{
     color: #171717;
     font-size: 50px;
     font-weight: 600;
@@ -54,5 +53,11 @@
 @media(max-width:600px){
     .search-container{
         width: 80%;
+    }
+    .all-products-text{
+        color: #171717;
+        font-size: 30px;
+        font-weight: 600;
+        text-align: center;
     }
 }
