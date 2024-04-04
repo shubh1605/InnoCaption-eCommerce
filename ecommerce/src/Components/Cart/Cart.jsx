@@ -57,8 +57,11 @@ const Cart = (props) => {
 
   useEffect(() => {
     const data = localStorage.getItem("cartProducts");
-    setCartItems(JSON.parse(data));
-    var t = Object.keys(data).length;
+    var t = 0;
+    if (data) {
+      setCartItems(JSON.parse(data));
+      t = Object.keys(data).length;
+    }
     if (t == 0) {
       setTotalCost(0);
     } else {
