@@ -1,0 +1,12 @@
+.number{
+    font-size: .6rem;
+  position: relative;
+  top: -12px;
+  right: 5px;
+  width: 45px;
+  height: 45px;
+  color: #fff;
+  background-color: #418deb;
+  border-radius: 50%;
+  padding: 5px;
+}
