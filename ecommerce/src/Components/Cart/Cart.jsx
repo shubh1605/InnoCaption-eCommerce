@@ -18,19 +18,34 @@ import CartCard from "../CartCard/CartCard";
 const Cart = (props) => {
   const [cartItems, setCartItems] = useState();
   const [totalCost, setTotalCost] = useState(0.0);
-  const [alertShow, setAlertShow] = useState(true);
+  const [alertShow, setAlertShow] = useState(false);
+
+  function formatDataToSend(cart, isAdding, prodid) {
+    var returnData = [];
+    if (isAdding) {
+      Object.keys(cart).map((item, i) => {
+        returnData.push({ id: item, quantity: cart[item]["quantity"] });
+      });
+      returnData.push({ id: prodid, quantity: 1 });
+    } else {
+      Object.keys(cart).map((item, i) => {
+        if (item != prodid) {
+          returnData.push({ id: item, quantity: cart[item]["quantity"] });
+        }
+      });
+    }
+    return returnData;
+  }
 
   function calcTotal(currCart) {
     var t = 0.0;
     var p = 0.0;
     Object.keys(currCart).map((item) => {
-      // var p = any;
       p =
         (currCart[item].product.price *
           Number(currCart[item].quantity) *
           (100 - currCart[item].product.discountPercentage)) /
         100;
-      // console.log(p);
       t += p;
     });
     setTotalCost(t.toFixed(2));
@@ -38,38 +53,63 @@ const Cart = (props) => {
 
   function removeFromCart(pid) {
     var prevCart = localStorage.getItem("cartProducts");
-    if (prevCart != null) {
-      prevCart = JSON.parse(prevCart);
-    } else {
-      console.log("there is some error");
-      prevCart = {};
-    }
-    if (pid in prevCart) {
-      delete prevCart[pid];
-    } else {
-      console.log("some error");
-    }
-    localStorage.setItem("cartProducts", JSON.stringify(prevCart));
-    setCartItems(prevCart);
-    calcTotal(prevCart);
-    props.getCartItemNumbers();
+    var updatedCart = formatDataToSend(prevCart, false, pid);
+
+    fetch("https://dummyjson.com/carts/1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        // If want to check the error, replace updatedCart with ""
+        // It will not update the cart.
+        products: updatedCart,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        // If the API response has an error message do not update the cart.
+        if (res["message"]) {
+          console.log("error");
+          setAlertShow(true);
+        } else {
+          if (prevCart != null) {
+            prevCart = JSON.parse(prevCart);
+          } else {
+            console.log("there is some error");
+            setAlertShow(true);
+            prevCart = {};
+          }
+          if (pid in prevCart) {
+            delete prevCart[pid];
+          } else {
+            setAlertShow(true);
+            console.log("some error");
+          }
+          localStorage.setItem("cartProducts", JSON.stringify(prevCart));
+          setCartItems(prevCart);
+          calcTotal(prevCart);
+          props.getCartItemNumbers();
+        }
+      });
   }
 
   useEffect(() => {
+    // Here instead of getting cart products from local storage,
+    // we can get the cart of the logged in user using the backend API.
     const data = localStorage.getItem("cartProducts");
     var t = 0;
+
+    // If there is a cart for the logged in user, get the number of products in the cart
     if (data) {
       setCartItems(JSON.parse(data));
       t = Object.keys(data).length;
     }
+    // Get the total cost of the products that are in the cart.
     if (t == 0) {
       setTotalCost(0);
     } else {
       calcTotal(JSON.parse(data));
     }
   }, []);
-
-  // console.log(cartItems)
 
   return (
     <div
@@ -104,12 +144,24 @@ const Cart = (props) => {
 
                       {props.itemNumbers != 0 ? (
                         <div>
+                          <Alert
+                            variant="danger"
+                            show={alertShow}
+                            onClose={() => setAlertShow(false)}
+                            dismissible
+                            className="text-center"
+                          >
+                            <Alert.Heading>
+                              Error! Please try again.
+                            </Alert.Heading>
+                          </Alert>
                           {Object.keys(cartItems).map((item, i) => (
                             <CartCard
                               cartProduct={cartItems[item]}
-                              key={i}
+                              key={item}
                               removeFromCart={removeFromCart}
                               calcTotal={calcTotal}
+                              setAlertShow={setAlertShow}
                             />
                           ))}
                         </div>
@@ -234,7 +286,12 @@ const Cart = (props) => {
                               {totalCost == 0.0 ? (
                                 <>$0.00</>
                               ) : (
-                                <>${Number(totalCost) + Number(20.0)}</>
+                                <>
+                                  $
+                                  {(Number(totalCost) + Number(20.0)).toFixed(
+                                    2
+                                  )}
+                                </>
                               )}
                             </p>
                           </div>
@@ -244,7 +301,12 @@ const Cart = (props) => {
                           ) : (
                             <MDBBtn color="info me-auto" block size="lg">
                               <div className="d-flex justify-content-between">
-                                <span>${Number(totalCost) + Number(20.0)}</span>
+                                <span>
+                                  $
+                                  {(Number(totalCost) + Number(20.0)).toFixed(
+                                    2
+                                  )}
+                                </span>
                                 <span>
                                   &nbsp; Pay Now{" "}
                                   <i className="fas fa-long-arrow-alt-right ms-2"></i>

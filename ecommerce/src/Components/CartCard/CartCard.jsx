@@ -16,27 +16,64 @@ const CartCard = (props) => {
   const [totalPrice, setTotalPrice] = useState();
   const [pid, setPid] = useState(props.cartProduct.product.id);
 
+  function formatDataToSend(cart, prodid, qty) {
+    var returnData = [];
+
+    Object.keys(cart).map((item, i) => {
+      if (item != prodid) {
+        returnData.push({ id: item, quantity: cart[item]["quantity"] });
+      } else {
+        returnData.push({ id: item, quantity: qty });
+      }
+    });
+
+    return returnData;
+  }
+
   function updateQuantity(value) {
-    setQty(value);
-    var t = (priceAfterDisc * value).toFixed(2);
-    setTotalPrice(t);
     var prevCart = localStorage.getItem("cartProducts");
-    if (prevCart != null) {
-      prevCart = JSON.parse(prevCart);
-    } else {
-      console.log("there is some error");
-      prevCart = {};
-    }
-    if (pid in prevCart) {
-      prevCart[pid] = {
-        quantity: Number(value),
-        product: props.cartProduct.product,
-      };
-    } else {
-      console.log("some error");
-    }
-    localStorage.setItem("cartProducts", JSON.stringify(prevCart));
-    props.calcTotal(prevCart);
+    var updatedCart = formatDataToSend(prevCart, pid, value);
+
+    fetch("https://dummyjson.com/carts/1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        // If want to check the error, replace updatedCart with ""
+        // It will not update the quantity.
+        products: updatedCart,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        // If the API response has an error message do not update the cart.
+        if (res["message"]) {
+          console.log("error");
+          props.setAlertShow(true);
+        } else {
+          setQty(value);
+          var t = (priceAfterDisc * value).toFixed(2);
+          setTotalPrice(t);
+
+          if (prevCart != null) {
+            prevCart = JSON.parse(prevCart);
+          } else {
+            console.log("there is some error");
+            prevCart = {};
+            props.setAlertShow(true);
+          }
+          if (pid in prevCart) {
+            prevCart[pid] = {
+              quantity: Number(value),
+              product: props.cartProduct.product,
+            };
+          } else {
+            console.log("some error");
+            props.setAlertShow(true);
+          }
+          localStorage.setItem("cartProducts", JSON.stringify(prevCart));
+          props.calcTotal(prevCart);
+        }
+      });
   }
   useEffect(() => {
     var p = (
@@ -71,7 +108,6 @@ const CartCard = (props) => {
                 </span>{" "}
                 <span className="newprice">${priceAfterDisc}</span>
               </p>
-              {/* <p className="brand">{props.cartProduct.product.brand}</p> */}
             </div>
           </div>
 
@@ -101,63 +137,6 @@ const CartCard = (props) => {
           </div>
         </div>
       </div>
-      {/* <MDBCard className="mb-3">
-        <MDBCardBody className="single-card">
-          <div className="d-flex justify-content-between">
-            <div className="d-flex flex-row align-items-center prodDetails">
-              <div className="prodImage">
-                <MDBCardImage
-                  src={props.cartProduct.product.thumbnail}
-                  fluid
-                  className="rounded-3 crd-img"
-                  alt="Shopping item"
-                  // style={{"width":"90%", "margin":"0px"}}
-                />
-              </div>
-              <div className="prodTitle">
-                <MDBTypography>{props.cartProduct.product.title}</MDBTypography>
-                <p className="brand">{props.cartProduct.product.brand}</p>
-              </div>
-            </div>
-            <div className="d-flex flex-row align-items-center priceDetails">
-              <div className="prodCommon">
-                <MDBTypography>
-                  ${props.cartProduct.product.price}
-                </MDBTypography>
-              </div>
-              <div className="prodCommon">
-                <MDBTypography>
-                  {props.cartProduct.product.discountPercentage}%
-                </MDBTypography>
-              </div>
-              <div className="prodCommon">
-                <MDBTypography>${priceAfterDisc}</MDBTypography>
-              </div>
-              <div className="prodQuantity">
-                <MDBTypography>
-                  <MDBInput
-                    id="typeNumber"
-                    type="number"
-                    min="1"
-                    value={qty}
-                    onChange={(e) => updateQuantity(e.target.value)}
-                  />
-                </MDBTypography>
-              </div>
-              <div className="prodCommon">
-                <MDBTypography>${totalPrice}</MDBTypography>
-              </div>
-              <div className="prodDelete">
-                <MDBIcon
-                  fas
-                  icon="trash-alt"
-                  onClick={() => props.removeFromCart(pid)}
-                />
-              </div>
-            </div>
-          </div>
-        </MDBCardBody>
-      </MDBCard> */}
     </div>
   );
 };
