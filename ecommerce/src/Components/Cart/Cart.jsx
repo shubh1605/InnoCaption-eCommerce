@@ -141,20 +141,17 @@ const Cart = (props) => {
                           </p>
                         </div>
                       </div>
-
+                      <Alert
+                        variant="danger"
+                        show={alertShow}
+                        onClose={() => setAlertShow(false)}
+                        dismissible
+                        className="text-center"
+                      >
+                        <Alert.Heading>Error! Please try again.</Alert.Heading>
+                      </Alert>
                       {props.itemNumbers != 0 ? (
                         <div>
-                          <Alert
-                            variant="danger"
-                            show={alertShow}
-                            onClose={() => setAlertShow(false)}
-                            dismissible
-                            className="text-center"
-                          >
-                            <Alert.Heading>
-                              Error! Please try again.
-                            </Alert.Heading>
-                          </Alert>
                           {Object.keys(cartItems).map((item, i) => (
                             <CartCard
                               cartProduct={cartItems[item]}

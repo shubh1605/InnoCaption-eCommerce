@@ -101,7 +101,6 @@ const AllProducts = (props) => {
             setAlertText("Something went wrong, try again!");
             alertSetShow(true);
           } else {
-            console.log(res);
             prevCart[prod.id] = {
               quantity: 1,
               product: prod,
